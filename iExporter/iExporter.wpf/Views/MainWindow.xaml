@@ -16,25 +16,43 @@
     
     <Grid VerticalAlignment="Top">
         <Grid Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
+
+            <Button x:Name="iTunesLibrarySelectButton"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                    Margin="10,0,10,0"
+                    ToolTip="select an iTunes library file"
+                    Content="select iTunes file"
+                    Grid.Column="0" Grid.Row="0"
+                    Click="OnITunesLibrarySelectButtonClick"/>
             
             <TextBox x:Name="iTunesLibraryFileLocationTextBox"
                      Style="{StaticResource MaterialDesignTextBox}"
                      IsReadOnly="True"
                      Margin="10,0,10,0"
                      IsHitTestVisible="False"
-                     Grid.Column="0" />
-
-            <Button x:Name="iTunesLibrarySelectButton"
+                     Grid.Column="1" Grid.Row="0" />
+            
+            <Button x:Name="ExportLocationButton"
                     Style="{StaticResource MaterialDesignRaisedAccentButton}"
-                    Margin="0,0,10,0"
-                    ToolTip="select an iTunes library file"
-                    Content="select iTunes file"
-                    Grid.Column="1"
-                    Click="OnITunesLibrarySelectButtonClick"/>
+                    Margin="10,10,10,0"
+                    ToolTip="select the export location folder"
+                    Content="select export folder"
+                    Grid.Column="0" Grid.Row="1" />
+
+            <TextBox x:Name="ExportLocationTextBox"
+                     Style="{StaticResource MaterialDesignTextBox}"
+                     IsReadOnly="True"
+                     Margin="10,0,10,0"
+                     IsHitTestVisible="False"
+                     Grid.Column="1" Grid.Row="1" />
         </Grid>
     </Grid>
 </Window>

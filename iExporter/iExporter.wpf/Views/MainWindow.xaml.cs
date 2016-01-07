@@ -11,10 +11,5 @@ namespace iExporter.wpf.Views
         {
             InitializeComponent();
         }
-
-        private void OnITunesLibrarySelectButtonClick(object sender, RoutedEventArgs e)
-        {
-            iTunesLibraryFileLocationTextBox.Text = "Clicked the button";
-        }
     }
 }

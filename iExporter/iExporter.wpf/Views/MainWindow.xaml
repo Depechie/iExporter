@@ -7,24 +7,27 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="iExporter"
         Height="640" Width="800"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto">
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
     
     <Grid VerticalAlignment="Stretch">
         <Grid Margin="0,10,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
             <Button x:Name="iTunesLibrarySelectButton"
@@ -33,14 +36,15 @@
                     ToolTip="select an iTunes library file"
                     Content="select iTunes file"
                     Grid.Column="0" Grid.Row="0"
-                    Click="OnITunesLibrarySelectButtonClick"/>
+                    />
             
             <TextBox x:Name="iTunesLibraryFileLocationTextBox"
                      Style="{StaticResource MaterialDesignTextBox}"
+                     Text="{Binding iTunesLibraryFileLocation, Mode=TwoWay}"
                      IsReadOnly="True"
                      Margin="10,0,10,0"
                      IsHitTestVisible="False"
-                     Grid.Column="1" Grid.Row="0" />
+                     Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" />
             
             <Button x:Name="ExportLocationButton"
                     Style="{StaticResource MaterialDesignRaisedAccentButton}"
@@ -54,9 +58,23 @@
                      IsReadOnly="True"
                      Margin="10,0,10,0"
                      IsHitTestVisible="False"
-                     Grid.Column="1" Grid.Row="1" />
+                     Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" />
 
-            <dragablz:TabablzControl Grid.Row="2" Grid.ColumnSpan="2"
+            <Button x:Name="ParseButton"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                    Margin="10,10,10,0"
+                    Content="load library"
+                    Grid.Column="0" Grid.Row="2"
+                    Command="{Binding LoadCommand}"/>
+
+            <Button x:Name="ExportButton"
+                    Style="{StaticResource MaterialDesignRaisedAccentButton}"
+                    Margin="10,10,10,0"
+                    Content="export selection"
+                    Grid.Column="1" Grid.Row="2"
+                    Command="{Binding ExportCommand}"/>
+
+            <dragablz:TabablzControl Grid.Row="3" Grid.ColumnSpan="3"
                                      Margin="10">
                 <dragablz:TabablzControl.InterTabController>
                     <dragablz:InterTabController />

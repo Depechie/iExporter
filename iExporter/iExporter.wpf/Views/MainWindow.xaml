@@ -36,6 +36,7 @@
                     ToolTip="select an iTunes library file"
                     Content="select iTunes file"
                     Grid.Column="0" Grid.Row="0"
+                    Command="{Binding SelectLibraryFileCommand}"
                     />
             
             <TextBox x:Name="iTunesLibraryFileLocationTextBox"

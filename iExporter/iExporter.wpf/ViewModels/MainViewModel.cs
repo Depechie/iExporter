@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
 
 namespace iExporter.wpf.ViewModels
 {
@@ -23,7 +24,23 @@ namespace iExporter.wpf.ViewModels
         private RelayCommand _exportCommand;        
         public RelayCommand ExportCommand => _exportCommand ?? (_exportCommand = new RelayCommand(async () => await ExportLibrary(), () => _canExportLibrary));
 
+        private RelayCommand _selectLibraryFileCommand;
+        public RelayCommand SelectLibraryFileCommand => _selectLibraryFileCommand ?? (_selectLibraryFileCommand = new RelayCommand(SelectLibrary));
+
         public MainViewModel(IMessenger messenger) : base(messenger)
+        {
+        }
+
+        private void SelectLibrary()
+        {
+            OpenFileDialog openLibraryDialog = new OpenFileDialog();
+            openLibraryDialog.Filter = "iTunes library (*.xml)|*.xml";
+
+            if (openLibraryDialog.ShowDialog() == true)
+                iTunesLibraryFileLocation = openLibraryDialog.FileName;
+        }
+
+        private void SelectFolder()
         {
         }
 

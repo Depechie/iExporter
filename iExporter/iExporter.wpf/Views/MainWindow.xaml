@@ -36,8 +36,7 @@
                     ToolTip="select an iTunes library file"
                     Content="select iTunes file"
                     Grid.Column="0" Grid.Row="0"
-                    Command="{Binding SelectLibraryFileCommand}"
-                    />
+                    Command="{Binding SelectLibraryFileCommand}" />
             
             <TextBox x:Name="iTunesLibraryFileLocationTextBox"
                      Style="{StaticResource MaterialDesignTextBox}"
@@ -52,14 +51,16 @@
                     Margin="10,10,10,0"
                     ToolTip="select the export location folder"
                     Content="select export folder"
-                    Grid.Column="0" Grid.Row="1" />
+                    Grid.Column="0" Grid.Row="1"
+                    Command="{Binding SelectFolderCommand}" />
 
             <TextBox x:Name="ExportLocationTextBox"
                      Style="{StaticResource MaterialDesignTextBox}"
+                     Text="{Binding iTunesLibraryFolderLocation, Mode=TwoWay}"
                      IsReadOnly="True"
                      Margin="10,0,10,0"
                      IsHitTestVisible="False"
-                     Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" />
+                     Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Height="{Binding ActualHeight, ElementName=iTunesLibraryFileLocationTextBox, Mode=OneWay}" VerticalAlignment="Bottom" />
 
             <Button x:Name="ParseButton"
                     Style="{StaticResource MaterialDesignRaisedAccentButton}"
@@ -81,7 +82,8 @@
                     <dragablz:InterTabController />
                 </dragablz:TabablzControl.InterTabController>
                 <TabItem Header="PLAYLISTS">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Hello World</TextBlock>
+                    <!--<TreeView ItemsSource="{Binding iTunesTracks, Mode=TwoWay}"
+                              ItemTemplate="{StaticResource iTunesTrackTreeViewDataTemplate}"/>-->
                 </TabItem>
                 <TabItem Header="ARTISTS">
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Material Design</TextBlock>

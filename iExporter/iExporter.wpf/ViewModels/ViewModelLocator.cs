@@ -1,5 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
+using iExporter.wpf.Services;
+using iExporter.wpf.Services.Interfaces;
 using Microsoft.Practices.ServiceLocation;
 
 namespace iExporter.wpf.ViewModels
@@ -13,6 +15,7 @@ namespace iExporter.wpf.ViewModels
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
             SimpleIoc.Default.Register<IMessenger, Messenger>();
+            SimpleIoc.Default.Register<IiTunesLibraryService, iTunesLibraryService>();
 
             Register<MainViewModel>();
         }

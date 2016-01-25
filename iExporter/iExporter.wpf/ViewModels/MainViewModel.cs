@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace iExporter.wpf.ViewModels
         private bool _canExportLibrary = false;
 
         private IiTunesLibraryService _iTunesLibraryService;
+        private List<iTunesTrack> _iTunesTrackList;
 
         private string _iTunesLibraryFileLocation;
         public string iTunesLibraryFileLocation
@@ -42,6 +45,13 @@ namespace iExporter.wpf.ViewModels
             set { Set(() => iTunesArtists, ref _iTunesArtists, value); }
         }
 
+        private int _selectedTab;
+        public int SelectedTab
+        {
+            get { return _selectedTab; }
+            set { Set(() => SelectedTab, ref _selectedTab, value); }
+        }
+
         //private ObservableCollection<iTunesTrack> _iTunesTracks = new ObservableCollection<iTunesTrack>();
         //public ObservableCollection<iTunesTrack> iTunesTracks
         //{
@@ -58,7 +68,7 @@ namespace iExporter.wpf.ViewModels
         private RelayCommand _selectLibraryFileCommand;        
         public RelayCommand SelectLibraryFileCommand => _selectLibraryFileCommand ?? (_selectLibraryFileCommand = new RelayCommand(SelectLibrary));
 
-        private RelayCommand _selectFolderCommand;
+        private RelayCommand _selectFolderCommand;        
         public RelayCommand SelectFolderCommand => _selectFolderCommand ?? (_selectFolderCommand = new RelayCommand(SelectFolder));
 
         public MainViewModel(IMessenger messenger, IiTunesLibraryService iTunesLibraryService) : base(messenger)
@@ -90,18 +100,25 @@ namespace iExporter.wpf.ViewModels
 
         private async Task LoadLibrary()
         {
-            //iTunesTracks.Clear();
+            iTunesArtists.Clear();
 
             string itunesLibraryContent = File.ReadAllText(iTunesLibraryFileLocation);
-            List<iTunesTrack> iTunesTrackList = _iTunesLibraryService.ParseLibrary(itunesLibraryContent);
+            List<iTunesTrack> parsedLib = _iTunesLibraryService.ParseLibrary(itunesLibraryContent);
 
-            var iTunesArtists = (from track in iTunesTrackList
-                                 where !string.IsNullOrEmpty(track.AlbumArtist)
-                                 orderby track.AlbumArtist
-                                 select track.AlbumArtist.ToLowerInvariant().ToTitleCase()).Distinct().ToList();
+            if (parsedLib != null && parsedLib.Any())
+            {
+                //Only add those tracks that actually have a given location
+                //TODO: Or show in list greyed out with indication iCloud?
+                _iTunesTrackList = parsedLib.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
 
-            foreach(string artist in iTunesArtists)
-                _iTunesArtists.Add(new TreeViewArtist() { Name = artist });
+                var artists = (from track in _iTunesTrackList
+                               where !string.IsNullOrEmpty(track.AlbumArtist)
+                               orderby track.AlbumArtist
+                               select track.AlbumArtist.ToLowerInvariant().ToTitleCase()).Distinct().ToList();
+
+                foreach (string artist in artists)
+                    iTunesArtists.Add(new TreeViewArtist() { Name = artist });
+            }
 
             //foreach(iTunesTrack track in iTunesTrackList)
             //    iTunesTracks.Add(track);
@@ -109,8 +126,27 @@ namespace iExporter.wpf.ViewModels
 
         private async Task ExportLibrary()
         {
-            throw new System.NotImplementedException();
+            switch (SelectedTab)
+            {
+                case 0:
+                    break;
+                case 1:
+                    List<TreeViewArtist> selectedArtists = iTunesArtists.Where(item => item.IsSelected).ToList();
+
+                    var t = from iTunesTrack track in _iTunesTrackList
+                            where selectedArtists.Exists(artist => artist.Name.Equals(track.AlbumArtist, StringComparison.OrdinalIgnoreCase))
+                            select track;
+                    //List < iTunesTrack > tracksToExport = (from iTunesTrack track in this._iTunesLibrary.iTunesTracks
+                    //                                       where this._iTunesAlbumArtistsToExport.Exists(delegate (string argument)
+                    //                                       {
+                    //                                           return argument.Equals(track.AlbumArtist, StringComparison.OrdinalIgnoreCase);
+                    //                                       })
+                    //                                       select track).Distinct().ToList();
+                    break;
+            }
         }
+
+        //TODO: Select / Deselect ALL option!
 
     }
 }

@@ -77,6 +77,7 @@
                     Command="{Binding ExportCommand}"/>
 
             <dragablz:TabablzControl Grid.Row="3" Grid.ColumnSpan="3"
+                                     SelectedIndex="{Binding SelectedTab, Mode=TwoWay}"
                                      Margin="10">
                 <dragablz:TabablzControl.InterTabController>
                     <dragablz:InterTabController />
@@ -85,7 +86,7 @@
                     <!--<TreeView ItemsSource="{Binding iTunesTracks, Mode=TwoWay}"
                               ItemTemplate="{StaticResource iTunesTrackTreeViewDataTemplate}"/>-->
                 </TabItem>
-                <TabItem Header="ARTISTS">
+                <TabItem Header="ALBUM ARTISTS">
                     <TreeView ItemsSource="{Binding iTunesArtists, Mode=TwoWay}"
                               ItemTemplate="{StaticResource iTunesArtistsTreeViewDataTemplate}"/>
                 </TabItem>

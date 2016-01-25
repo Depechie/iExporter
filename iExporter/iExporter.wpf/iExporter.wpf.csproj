@@ -92,11 +92,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\XElementExtensions.cs" />
     <Compile Include="Models\BaseClass.cs" />
     <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\iTunesPlaylist.cs" />
     <Compile Include="Models\iTunesTrack.cs" />
+    <Compile Include="Models\TreeViewArtist.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Services\Interfaces\IiTunesLibraryService.cs" />
     <Compile Include="Services\iTunesLibraryService.cs" />

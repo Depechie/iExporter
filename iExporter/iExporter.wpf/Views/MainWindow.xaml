@@ -86,7 +86,8 @@
                               ItemTemplate="{StaticResource iTunesTrackTreeViewDataTemplate}"/>-->
                 </TabItem>
                 <TabItem Header="ARTISTS">
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Material Design</TextBlock>
+                    <TreeView ItemsSource="{Binding iTunesArtists, Mode=TwoWay}"
+                              ItemTemplate="{StaticResource iTunesArtistsTreeViewDataTemplate}"/>
                 </TabItem>
             </dragablz:TabablzControl>
         </Grid>

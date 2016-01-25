@@ -7,4 +7,13 @@
                                DataType="{x:Type models:iTunesTrack}" >
         <TextBlock Text="{Binding Name}" />
     </HierarchicalDataTemplate>-->
+
+    <HierarchicalDataTemplate  x:Key="iTunesArtistsTreeViewDataTemplate"
+                               x:Name="iTunesArtistsTreeViewDataTemplate"
+                               DataType="{x:Type models:TreeViewArtist}">
+        <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsSelected}" Margin="0,0,10,0"/>
+            <TextBlock Text="{Binding Name}" Margin="0,1,0,0" />
+        </StackPanel>
+    </HierarchicalDataTemplate>    
 </ResourceDictionary>

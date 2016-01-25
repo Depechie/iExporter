@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using iExporter.wpf.Extensions;
 using iExporter.wpf.Models;
 using iExporter.wpf.Services.Interfaces;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -31,6 +33,13 @@ namespace iExporter.wpf.ViewModels
         {
             get { return _iTunesLibraryFolderLocation; }
             set { Set(() => iTunesLibraryFolderLocation, ref _iTunesLibraryFolderLocation, value); }
+        }
+
+        private List<TreeViewArtist> _iTunesArtists = new List<TreeViewArtist>();
+        public List<TreeViewArtist> iTunesArtists
+        {
+            get { return _iTunesArtists; }
+            set { Set(() => iTunesArtists, ref _iTunesArtists, value); }
         }
 
         //private ObservableCollection<iTunesTrack> _iTunesTracks = new ObservableCollection<iTunesTrack>();
@@ -85,6 +94,14 @@ namespace iExporter.wpf.ViewModels
 
             string itunesLibraryContent = File.ReadAllText(iTunesLibraryFileLocation);
             List<iTunesTrack> iTunesTrackList = _iTunesLibraryService.ParseLibrary(itunesLibraryContent);
+
+            var iTunesArtists = (from track in iTunesTrackList
+                                 where !string.IsNullOrEmpty(track.AlbumArtist)
+                                 orderby track.AlbumArtist
+                                 select track.AlbumArtist.ToLowerInvariant().ToTitleCase()).Distinct().ToList();
+
+            foreach(string artist in iTunesArtists)
+                _iTunesArtists.Add(new TreeViewArtist() { Name = artist });
 
             //foreach(iTunesTrack track in iTunesTrackList)
             //    iTunesTracks.Add(track);

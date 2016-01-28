@@ -3,6 +3,7 @@
     public class TreeViewArtist : BaseClass
     {
         private bool _isSelected;
+        //private bool _isEnabled;
         private string _name;
 
         public bool IsSelected
@@ -15,6 +16,17 @@
                 OnPropertyChanged();
             }
         }
+
+        //public bool IsEnabled
+        //{
+        //    get { return _isEnabled; }
+        //    set
+        //    {
+        //        if (value == _isEnabled) return;
+        //        _isEnabled = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
 
         public string Name
         {

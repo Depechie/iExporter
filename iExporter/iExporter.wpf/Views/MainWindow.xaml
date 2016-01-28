@@ -14,7 +14,7 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        DataContext="{Binding Main, Source={StaticResource Locator}}">
+        DataContext="{Binding Main, Source={StaticResource Locator}}" WindowStartupLocation="CenterScreen">
     
     <Grid VerticalAlignment="Stretch">
         <Grid Margin="0,10,0,0">
@@ -82,11 +82,11 @@
                 <dragablz:TabablzControl.InterTabController>
                     <dragablz:InterTabController />
                 </dragablz:TabablzControl.InterTabController>
-                <TabItem Header="PLAYLISTS">
+                <TabItem Header="playlists">
                     <!--<TreeView ItemsSource="{Binding iTunesTracks, Mode=TwoWay}"
                               ItemTemplate="{StaticResource iTunesTrackTreeViewDataTemplate}"/>-->
                 </TabItem>
-                <TabItem Header="ALBUM ARTISTS">
+                <TabItem Header="album artists">
                     <TreeView ItemsSource="{Binding iTunesArtists, Mode=TwoWay}"
                               ItemTemplate="{StaticResource iTunesArtistsTreeViewDataTemplate}"/>
                 </TabItem>

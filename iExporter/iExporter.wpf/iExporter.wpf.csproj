@@ -99,6 +99,8 @@
     <Compile Include="Models\iTunesPlaylist.cs" />
     <Compile Include="Models\iTunesTrack.cs" />
     <Compile Include="Models\TreeViewArtist.cs" />
+    <Compile Include="Models\TreeViewItem.cs" />
+    <Compile Include="Models\TreeViewPlaylist.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Services\Interfaces\IiTunesLibraryService.cs" />
     <Compile Include="Services\iTunesLibraryService.cs" />

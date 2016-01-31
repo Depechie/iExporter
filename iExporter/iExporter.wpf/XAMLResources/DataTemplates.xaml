@@ -15,5 +15,14 @@
             <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,10,0"/>
             <TextBlock Text="{Binding Name}" Margin="0,1,0,0" />
         </StackPanel>
-    </HierarchicalDataTemplate>    
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate  x:Key="iTunesPlaylistsTreeViewDataTemplate"
+                               x:Name="iTunesPlaylistsTreeViewDataTemplate"
+                               DataType="{x:Type models:TreeViewPlaylist}">
+        <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,10,0"/>
+            <TextBlock Text="{Binding Name}" Margin="0,1,0,0" />
+        </StackPanel>
+    </HierarchicalDataTemplate>
 </ResourceDictionary>

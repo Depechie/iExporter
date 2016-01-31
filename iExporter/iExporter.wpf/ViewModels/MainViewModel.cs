@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,6 +44,13 @@ namespace iExporter.wpf.ViewModels
         {
             get { return _iTunesArtists; }
             set { Set(() => iTunesArtists, ref _iTunesArtists, value); }
+        }
+
+        private List<TreeViewPlaylist> _iTunesPlaylists = new List<TreeViewPlaylist>();
+        public List<TreeViewPlaylist> iTunesPlaylists
+        {
+            get { return _iTunesPlaylists; }
+            set { Set(() => iTunesPlaylists, ref _iTunesPlaylists, value); }
         }
 
         private int _selectedTab;
@@ -110,6 +118,8 @@ namespace iExporter.wpf.ViewModels
 
             if (parsedTracks != null && parsedTracks.Any())
             {
+                iTunesArtists.Clear();
+
                 //Only add those tracks that actually have a given location
                 //TODO: Or show in list greyed out with indication iCloud?
                 _iTunesTrackList = parsedTracks.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
@@ -125,7 +135,11 @@ namespace iExporter.wpf.ViewModels
 
             if (parsedPlaylists != null && parsedPlaylists.Any())
             {
-                
+                iTunesPlaylists.Clear();
+
+                //iTunesPlaylists.AddRange(parsedPlaylists.Where(item => item.Parent == null).Select(item => new TreeViewPlaylist() { Id = item.Id, PlaylistPersistentID = item.PlaylistPersistentID, Name = item.Name }));
+                foreach (iTunesPlaylist playList in parsedPlaylists.Where(item => item.Parent == null))
+                    iTunesPlaylists.Add(new TreeViewPlaylist() { Name = playList.Name });
             }
         }
 

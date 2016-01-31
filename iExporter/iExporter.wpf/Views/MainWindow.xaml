@@ -83,8 +83,8 @@
                     <dragablz:InterTabController />
                 </dragablz:TabablzControl.InterTabController>
                 <TabItem Header="playlists">
-                    <!--<TreeView ItemsSource="{Binding iTunesTracks, Mode=TwoWay}"
-                              ItemTemplate="{StaticResource iTunesTrackTreeViewDataTemplate}"/>-->
+                    <TreeView ItemsSource="{Binding iTunesPlaylists, Mode=TwoWay}"
+                              ItemTemplate="{StaticResource iTunesPlaylistsTreeViewDataTemplate}"/>
                 </TabItem>
                 <TabItem Header="album artists">
                     <TreeView ItemsSource="{Binding iTunesArtists, Mode=TwoWay}"

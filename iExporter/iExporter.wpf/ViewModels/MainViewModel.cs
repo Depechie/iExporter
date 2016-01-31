@@ -103,13 +103,16 @@ namespace iExporter.wpf.ViewModels
             iTunesArtists.Clear();
 
             string itunesLibraryContent = File.ReadAllText(iTunesLibraryFileLocation);
-            List<iTunesTrack> parsedLib = _iTunesLibraryService.ParseLibrary(itunesLibraryContent);
 
-            if (parsedLib != null && parsedLib.Any())
+            List<iTunesTrack> parsedTracks = new List<iTunesTrack>();
+            List<iTunesPlaylist> parsedPlaylists = new List<iTunesPlaylist>();
+            _iTunesLibraryService.ParseLibrary(itunesLibraryContent, out parsedTracks, out parsedPlaylists);
+
+            if (parsedTracks != null && parsedTracks.Any())
             {
                 //Only add those tracks that actually have a given location
                 //TODO: Or show in list greyed out with indication iCloud?
-                _iTunesTrackList = parsedLib.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
+                _iTunesTrackList = parsedTracks.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
 
                 var artists = (from track in _iTunesTrackList
                                where !string.IsNullOrEmpty(track.AlbumArtist)
@@ -120,8 +123,10 @@ namespace iExporter.wpf.ViewModels
                     iTunesArtists.Add(new TreeViewArtist() { Name = artist });
             }
 
-            //foreach(iTunesTrack track in iTunesTrackList)
-            //    iTunesTracks.Add(track);
+            if (parsedPlaylists != null && parsedPlaylists.Any())
+            {
+                
+            }
         }
 
         private async Task ExportLibrary()

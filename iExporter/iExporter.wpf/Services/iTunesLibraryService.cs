@@ -14,13 +14,22 @@ namespace iExporter.wpf.Services
     public class iTunesLibraryService : IiTunesLibraryService
     {
         private XDocument _itunesLibraryXDocument;
+        private List<string> _defaultiTunesPlayLists = new List<string> { Constants.PLAYLIST_AUDIOBOOKS,
+                                                                          Constants.PLAYLIST_GENIUS,
+                                                                          Constants.PLAYLIST_LIBRARY,
+                                                                          Constants.PLAYLIST_MOVIES,
+                                                                          Constants.PLAYLIST_MUSIC,
+                                                                          Constants.PLAYLIST_TVSHOWS };
+        private List<iTunesTrack> _iTunesTracks;
 
         /// <summary>
         /// Parse the given iTunes Library file
         /// It will go through all the available playlists and tracks
         /// </summary>
         /// <param name="iTunesLibraryContent"></param>
-        public List<iTunesTrack> ParseLibrary(string iTunesLibraryContent)
+        /// <param name="iTunesTracks"></param>
+        /// <param name="iTunesPlaylists"></param>
+        public void ParseLibrary(string iTunesLibraryContent, out List<iTunesTrack> iTunesTracks, out List<iTunesPlaylist> iTunesPlaylists)
         {
             //Precondition checks
             if (string.IsNullOrEmpty(iTunesLibraryContent))
@@ -29,7 +38,8 @@ namespace iExporter.wpf.Services
             _itunesLibraryXDocument = XDocument.Parse(iTunesLibraryContent);
 
             //TODO: perform parsing in multiple threads
-            return InitiTunesTracks();
+            iTunesTracks = InitiTunesTracks();
+            iTunesPlaylists = InitiTunesPlaylists();
         }
 
         /// <summary>
@@ -42,7 +52,7 @@ namespace iExporter.wpf.Services
                                                                 from key in track.Descendants("key")
                                                                 select new XElement(((string)key).Replace(" ", ""), (string)(XElement)key.NextNode)));
 
-            return (trackDictionary.Nodes().Select(track => new iTunesTrack()
+            _iTunesTracks = (trackDictionary.Nodes().Select(track => new iTunesTrack()
             {
                 Id = ((XElement)track).Element("TrackID").ToInt(0),
                 Album = ((XElement)track).Element("Album").ToString(string.Empty),
@@ -63,6 +73,60 @@ namespace iExporter.wpf.Services
                 TotalTime = ((XElement)track).Element("TotalTime").ToInt64(0) / 1000,
                 TrackNumber = ((XElement)track).Element("TrackNumber").ToInt(0)
             })).ToList();
+
+            return _iTunesTracks;
+        }
+
+        /// <summary>
+        /// Get all available playlists from the given library
+        /// </summary>
+        /// <returns></returns>
+        private List<iTunesPlaylist> InitiTunesPlaylists()
+        {
+            //Get all the available playlists, but don't add the PlaylistItems Node
+            XElement playListDictionary = new XElement("PlayLists", from iTunesPlayList in _itunesLibraryXDocument.Descendants("plist").Elements("dict").Elements("array").Elements("dict")
+                                                                    select new XElement("playList",
+                                                                      from key in iTunesPlayList.Descendants("key")
+                                                                      where key.Value.Replace(" ", "") != "PlaylistItems" // && key.Value.Replace(" ","") != "TrackID"
+                                                                      select new XElement(key.Value.Replace(" ", ""), ((XElement)key.NextNode).Value)));
+
+            //From all available playlists, get a IEnumerable list that only contains user playlists and at least one track!
+            //Load the corresponding tracks from the IEnumerable track list
+            List<iTunesPlaylist> iTunesPlaylists = (from XElement playList in playListDictionary.Nodes()
+                                                    let playListTracks = from trackField in playList.Elements("TrackID")
+                                                                         select trackField
+                                                                         where !this._defaultiTunesPlayLists.Contains(playList.Element("Name").Value) && playListTracks.Any()
+                                    select new iTunesPlaylist()
+                                    {
+                                        Id = playList.Element("PlaylistID").ToString(string.Empty),
+                                        PlaylistPersistentID = playList.Element("PlaylistPersistentID").ToString(string.Empty),
+                                        ParentPersistentID = playList.Element("ParentPersistentID").ToString(string.Empty),
+                                        Name = playList.Element("Name").ToString(string.Empty),
+                                        iTunesTracks = from iTunesTrack track in _iTunesTracks
+                                                       where (from trackID in playList.Elements("TrackID")
+                                                              select trackID.Value).Contains(track.Id.ToString())
+                                                       select track
+                                    }).ToList();
+
+            //Add playlist relationships
+            foreach (iTunesPlaylist playList in iTunesPlaylists)
+            {
+                //Set the parent of each playlist
+                if (!string.IsNullOrEmpty(playList.ParentPersistentID))
+                {
+                    playList.Parent = iTunesPlaylists.FirstOrDefault(item => !string.IsNullOrEmpty(item.PlaylistPersistentID) && item.PlaylistPersistentID.Equals(playList.ParentPersistentID, StringComparison.OrdinalIgnoreCase));
+                    //Set the children playlists
+                    if (!ReferenceEquals(playList.Parent, null))
+                    {
+                        if (ReferenceEquals(playList.Parent.Children, null))
+                            playList.Parent.Children = new List<iTunesPlaylist>();
+
+                        playList.Parent.Children.Add(playList);
+                    }
+                }
+            }
+
+            return iTunesPlaylists;
         }
     }
 }

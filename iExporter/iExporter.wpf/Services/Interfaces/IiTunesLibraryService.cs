@@ -11,7 +11,8 @@ namespace iExporter.wpf.Services.Interfaces
         /// It will go through all the available playlists and tracks
         /// </summary>
         /// <param name="iTunesLibraryContent"></param>
-        /// <returns></returns>
-        List<iTunesTrack> ParseLibrary(string iTunesLibraryContent);
+        /// <param name="iTunesTracks"></param>
+        /// <param name="iTunesPlaylists"></param>
+        void ParseLibrary(string iTunesLibraryContent, out List<iTunesTrack> iTunesTracks, out List<iTunesPlaylist> iTunesPlaylists);
     }
 }

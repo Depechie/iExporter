@@ -15,7 +15,7 @@ namespace iExporter.wpf.Models
         private string _name;
         private IEnumerable<iTunesTrack> _iTunesTracks;
         private iTunesPlaylist _parent;
-        private List<iTunesPlaylist> _children;
+        private List<iTunesPlaylist> _children = new List<iTunesPlaylist>();
 
         public string Id
         {

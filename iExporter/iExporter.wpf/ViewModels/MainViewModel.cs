@@ -24,6 +24,7 @@ namespace iExporter.wpf.ViewModels
 
         private IiTunesLibraryService _iTunesLibraryService;
         private List<iTunesTrack> _iTunesTrackList;
+        private List<TreeViewPlaylist> _localPlayLists = new List<TreeViewPlaylist>();
 
         private string _iTunesLibraryFileLocation;
         public string iTunesLibraryFileLocation
@@ -39,15 +40,15 @@ namespace iExporter.wpf.ViewModels
             set { Set(() => iTunesLibraryFolderLocation, ref _iTunesLibraryFolderLocation, value); }
         }
 
-        private List<TreeViewArtist> _iTunesArtists = new List<TreeViewArtist>();
-        public List<TreeViewArtist> iTunesArtists
+        private ObservableCollection<TreeViewArtist> _iTunesArtists = new ObservableCollection<TreeViewArtist>();
+        public ObservableCollection<TreeViewArtist> iTunesArtists
         {
             get { return _iTunesArtists; }
             set { Set(() => iTunesArtists, ref _iTunesArtists, value); }
         }
 
-        private List<TreeViewPlaylist> _iTunesPlaylists = new List<TreeViewPlaylist>();
-        public List<TreeViewPlaylist> iTunesPlaylists
+        private ObservableCollection<TreeViewPlaylist> _iTunesPlaylists = new ObservableCollection<TreeViewPlaylist>();
+        public ObservableCollection<TreeViewPlaylist> iTunesPlaylists
         {
             get { return _iTunesPlaylists; }
             set { Set(() => iTunesPlaylists, ref _iTunesPlaylists, value); }
@@ -59,13 +60,6 @@ namespace iExporter.wpf.ViewModels
             get { return _selectedTab; }
             set { Set(() => SelectedTab, ref _selectedTab, value); }
         }
-
-        //private ObservableCollection<iTunesTrack> _iTunesTracks = new ObservableCollection<iTunesTrack>();
-        //public ObservableCollection<iTunesTrack> iTunesTracks
-        //{
-        //    get { return _iTunesTracks; }
-        //    set { Set(() => iTunesTracks, ref _iTunesTracks, value); }
-        //}
 
         private RelayCommand _loadCommand;        
         public RelayCommand LoadCommand => _loadCommand ?? (_loadCommand = new RelayCommand(async () => await LoadLibrary(), () => _canLoadLibrary));
@@ -131,15 +125,33 @@ namespace iExporter.wpf.ViewModels
 
                 foreach (string artist in artists)
                     iTunesArtists.Add(new TreeViewArtist() { Name = artist });
-            }
+            }            
 
             if (parsedPlaylists != null && parsedPlaylists.Any())
             {
+                _localPlayLists.Clear();
                 iTunesPlaylists.Clear();
 
-                //iTunesPlaylists.AddRange(parsedPlaylists.Where(item => item.Parent == null).Select(item => new TreeViewPlaylist() { Id = item.Id, PlaylistPersistentID = item.PlaylistPersistentID, Name = item.Name }));
-                foreach (iTunesPlaylist playList in parsedPlaylists.Where(item => item.Parent == null))
-                    iTunesPlaylists.Add(new TreeViewPlaylist() { Name = playList.Name });
+                var rootPlaylists = parsedPlaylists.Where(item => item.Parent == null);
+                foreach (iTunesPlaylist playList in rootPlaylists)
+                    _localPlayLists.Add(new TreeViewPlaylist() { Name = playList.Name, Id = playList.Id, PlaylistPersistentID = playList.PlaylistPersistentID });
+
+                foreach (iTunesPlaylist playlist in rootPlaylists.Where(item => item.Children != null))
+                    AddChildren(playlist);
+
+                foreach (TreeViewPlaylist treeViewPlaylist in _localPlayLists)
+                    iTunesPlaylists.Add(treeViewPlaylist);
+            }
+        }
+
+        private void AddChildren(iTunesPlaylist playlist)
+        {
+            foreach (iTunesPlaylist child in playlist.Children)
+            {
+                var treeViewPlaylist = _localPlayLists.FirstOrDefault(item => item.PlaylistPersistentID == playlist.PlaylistPersistentID);
+                treeViewPlaylist?.Children.Add(new TreeViewPlaylist() { Name = child.Name, Id = child.Id, PlaylistPersistentID = child.PlaylistPersistentID });
+
+                AddChildren(child);
             }
         }
 

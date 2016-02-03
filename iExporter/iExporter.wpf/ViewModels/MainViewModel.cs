@@ -160,6 +160,8 @@ namespace iExporter.wpf.ViewModels
             switch (SelectedTab)
             {
                 case 0:
+                    List<TreeViewPlaylist> selectedPlaylists = iTunesPlaylists.RecursiveSelect(item => item.Children).Where(item => item.IsSelected).ToList();
+                    var s = "";
                     break;
                 case 1:
                     List<TreeViewArtist> selectedArtists = iTunesArtists.Where(item => item.IsSelected).ToList();

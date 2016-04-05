@@ -23,7 +23,8 @@ namespace iExporter.wpf.ViewModels
         private bool _canExportLibrary = false;
 
         private IiTunesLibraryService _iTunesLibraryService;
-        private List<iTunesTrack> _iTunesTrackList;
+        private List<iTunesTrack> _parsedTracks;
+        private List<iTunesPlaylist> _parsedPlaylists;
         private List<TreeViewPlaylist> _localPlayLists = new List<TreeViewPlaylist>();
 
         private string _iTunesLibraryFileLocation;
@@ -116,9 +117,9 @@ namespace iExporter.wpf.ViewModels
 
                 //Only add those tracks that actually have a given location
                 //TODO: Or show in list greyed out with indication iCloud?
-                _iTunesTrackList = parsedTracks.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
+                _parsedTracks = parsedTracks.Where(item => !string.IsNullOrEmpty(item.Location)).ToList();
 
-                var artists = (from track in _iTunesTrackList
+                var artists = (from track in _parsedTracks
                                where !string.IsNullOrEmpty(track.AlbumArtist)
                                orderby track.AlbumArtist
                                select track.AlbumArtist.ToLowerInvariant().ToTitleCase()).Distinct().ToList();
@@ -129,6 +130,7 @@ namespace iExporter.wpf.ViewModels
 
             if (parsedPlaylists != null && parsedPlaylists.Any())
             {
+                _parsedPlaylists = parsedPlaylists;
                 _localPlayLists.Clear();
                 iTunesPlaylists.Clear();
 
@@ -137,7 +139,8 @@ namespace iExporter.wpf.ViewModels
                     _localPlayLists.Add(new TreeViewPlaylist() { Name = playList.Name, Id = playList.Id, PlaylistPersistentID = playList.PlaylistPersistentID });
 
                 foreach (iTunesPlaylist playlist in rootPlaylists.Where(item => item.Children != null))
-                    AddChildren(playlist);
+                    foreach(iTunesPlaylist child in playlist.Children)
+                        AddChildren(child);
 
                 foreach (TreeViewPlaylist treeViewPlaylist in _localPlayLists)
                     iTunesPlaylists.Add(treeViewPlaylist);
@@ -146,13 +149,11 @@ namespace iExporter.wpf.ViewModels
 
         private void AddChildren(iTunesPlaylist playlist)
         {
-            foreach (iTunesPlaylist child in playlist.Children)
-            {
-                var treeViewPlaylist = _localPlayLists.FirstOrDefault(item => item.PlaylistPersistentID == playlist.PlaylistPersistentID);
-                treeViewPlaylist?.Children.Add(new TreeViewPlaylist() { Name = child.Name, Id = child.Id, PlaylistPersistentID = child.PlaylistPersistentID });
+            var parentTreeViewPlaylist = _localPlayLists.RecursiveSelect(item => item.Children).FirstOrDefault(item => item.PlaylistPersistentID == playlist.ParentPersistentID);
+            parentTreeViewPlaylist?.Children.Add(new TreeViewPlaylist() { Name = playlist.Name, Id = playlist.Id, PlaylistPersistentID = playlist.PlaylistPersistentID });
 
+            foreach (iTunesPlaylist child in playlist.Children)
                 AddChildren(child);
-            }
         }
 
         private async Task ExportLibrary()
@@ -161,20 +162,17 @@ namespace iExporter.wpf.ViewModels
             {
                 case 0:
                     List<TreeViewPlaylist> selectedPlaylists = iTunesPlaylists.RecursiveSelect(item => item.Children).Where(item => item.IsSelected).ToList();
-                    var s = "";
+                    var selectediTunesplaylists = (from iTunesPlaylist playlist in _parsedPlaylists
+                                                   where selectedPlaylists.Exists(item => item.PlaylistPersistentID == playlist.PlaylistPersistentID)
+                                                   select playlist).ToList();
+                    _iTunesLibraryService.Export(selectediTunesplaylists);
                     break;
                 case 1:
                     List<TreeViewArtist> selectedArtists = iTunesArtists.Where(item => item.IsSelected).ToList();
 
-                    var t = from iTunesTrack track in _iTunesTrackList
-                            where selectedArtists.Exists(artist => artist.Name.Equals(track.AlbumArtist, StringComparison.OrdinalIgnoreCase))
-                            select track;
-                    //List < iTunesTrack > tracksToExport = (from iTunesTrack track in this._iTunesLibrary.iTunesTracks
-                    //                                       where this._iTunesAlbumArtistsToExport.Exists(delegate (string argument)
-                    //                                       {
-                    //                                           return argument.Equals(track.AlbumArtist, StringComparison.OrdinalIgnoreCase);
-                    //                                       })
-                    //                                       select track).Distinct().ToList();
+                    var selectediTunesTracks = from iTunesTrack track in _parsedTracks
+                                               where selectedArtists.Exists(artist => artist.Name.Equals(track.AlbumArtist, StringComparison.OrdinalIgnoreCase))
+                                               select track;
                     break;
             }
         }

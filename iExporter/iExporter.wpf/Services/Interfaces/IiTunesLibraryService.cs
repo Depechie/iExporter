@@ -14,5 +14,7 @@ namespace iExporter.wpf.Services.Interfaces
         /// <param name="iTunesTracks"></param>
         /// <param name="iTunesPlaylists"></param>
         void ParseLibrary(string iTunesLibraryContent, out List<iTunesTrack> iTunesTracks, out List<iTunesPlaylist> iTunesPlaylists);
+
+        void Export(List<iTunesPlaylist> playlists);
     }
 }

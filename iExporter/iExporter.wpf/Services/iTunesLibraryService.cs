@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 using iExporter.wpf.Extensions;
 using iExporter.wpf.Models;
@@ -21,6 +22,7 @@ namespace iExporter.wpf.Services
                                                                           Constants.PLAYLIST_MUSIC,
                                                                           Constants.PLAYLIST_TVSHOWS };
         private List<iTunesTrack> _iTunesTracks;
+        private string _iTunesLibraryLocation;
 
         /// <summary>
         /// Parse the given iTunes Library file
@@ -37,9 +39,29 @@ namespace iExporter.wpf.Services
 
             _itunesLibraryXDocument = XDocument.Parse(iTunesLibraryContent);
 
+            string iTunesLibraryLocation = (from iTunesLibNode in _itunesLibraryXDocument.Descendants("plist").Elements("dict")
+                                            from key in iTunesLibNode.Descendants("key")
+                                            where key.Value.Replace(" ", "").Equals("MusicFolder")
+                                            select ((XElement)key.NextNode).Value).FirstOrDefault();
+
+            _iTunesLibraryLocation = HttpUtility.UrlDecode(iTunesLibraryLocation.Replace(Constants.URI_LOCALHOST, string.Empty)).Replace('/', Path.DirectorySeparatorChar);
+
             //TODO: perform parsing in multiple threads
             iTunesTracks = InitiTunesTracks();
             iTunesPlaylists = InitiTunesPlaylists();
+        }
+
+        public void Export(List<iTunesPlaylist> playlists)
+        {
+            //TODO: Clear destination? Configuration option?
+            //TODO: Sync with destination? Configuration option? ( means that we will be adding files not found and deleting files not in playlist )
+
+            List<iTunesTrack> tracksToExport = new List<iTunesTrack>();
+
+            foreach (iTunesPlaylist playlist in playlists)
+                tracksToExport.AddRange(playlist.iTunesTracks);
+
+            ExportTracks(tracksToExport);
         }
 
         /// <summary>
@@ -127,6 +149,14 @@ namespace iExporter.wpf.Services
             }
 
             return iTunesPlaylists;
+        }
+
+        private void ExportTracks(List<iTunesTrack> tracks)
+        {
+            foreach (iTunesTrack track in tracks.Where(item => !string.IsNullOrEmpty(item.Location)).Distinct())
+            {
+                var t = track.Location;
+            }
         }
     }
 }
